@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
 import { PERIODS, DAYS, SCHEDULE, type Day } from '@/lib/timetable';
 
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
@@ -84,65 +83,67 @@ export default function TodayTimeline({ onOpen }: { onOpen?: () => void }) {
       onClick={onOpen}
       className="w-full card-flat rounded-3xl px-3.5 pt-3 pb-3 mb-4 text-left active:scale-[0.995] transition"
     >
-      <div className="flex items-center justify-between mb-2 px-0.5">
+      <div className="flex items-center justify-between mb-3 px-0.5">
         <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-ink-3">
           오늘
         </p>
         <p className="text-[12px] font-bold text-ink-1 truncate">{headline}</p>
       </div>
 
-      {/* arrow rail */}
-      <div className="relative h-4 mb-0.5">
-        {arrowPercent !== null && today && (
-          <div
-            className="absolute top-0 transition-[left] duration-700 ease-out -translate-x-1/2"
-            style={{ left: `${arrowPercent}%` }}
-          >
-            <ChevronDown size={18} strokeWidth={3} className="arrow-now" />
-          </div>
-        )}
-      </div>
-
-      {/* 8 cells */}
-      <div className="grid grid-cols-8 gap-[3px]">
-        {PERIODS.map((p, i) => {
-          const lesson = today ? todaySchedule[p.id] : null;
-          const active = loc.state === 'in' && loc.idx === i;
-          if (!lesson) {
+      {/* 8 cells with vertical red current-time line overlay */}
+      <div className="relative">
+        <div className="grid grid-cols-8 gap-[3px]">
+          {PERIODS.map((p, i) => {
+            const lesson = today ? todaySchedule[p.id] : null;
+            const active = loc.state === 'in' && loc.idx === i;
+            if (!lesson) {
+              return (
+                <div
+                  key={p.id}
+                  className={[
+                    'h-[44px] rounded-md flex flex-col items-center justify-center',
+                    active ? 'cell-free-now' : 'cell-free',
+                  ].join(' ')}
+                >
+                  <span className="text-[9px] font-bold tabular-nums leading-none opacity-80">
+                    {p.id}
+                  </span>
+                  <span className="text-[8px] mt-0.5 leading-none">공강</span>
+                </div>
+              );
+            }
+            const cellClass = active ? 'cell-class-now' : 'cell-class';
             return (
               <div
                 key={p.id}
                 className={[
                   'h-[44px] rounded-md flex flex-col items-center justify-center',
-                  active ? 'cell-free-now' : 'cell-free',
+                  cellClass,
                 ].join(' ')}
               >
-                <span className="text-[9px] font-bold tabular-nums leading-none opacity-80">
-                  {p.id}
+                <span className="text-[10px] font-bold tabular-nums leading-none">
+                  {lesson.room}
                 </span>
-                <span className="text-[8px] mt-0.5 leading-none">공강</span>
+                <span className="text-[8px] font-semibold mt-0.5 leading-none opacity-80">
+                  {lesson.subject}
+                </span>
               </div>
             );
-          }
-          const cellClass = lesson.accent
-            ? 'cell-class-mark'
-            : active
-            ? 'cell-class-now'
-            : 'cell-class';
-          return (
+          })}
+        </div>
+
+        {arrowPercent !== null && today && (
+          <>
             <div
-              key={p.id}
-              className={['h-[44px] rounded-md flex flex-col items-center justify-center', cellClass].join(' ')}
-            >
-              <span className="text-[10px] font-bold tabular-nums leading-none">
-                {lesson.room}
-              </span>
-              <span className="text-[8px] font-semibold mt-0.5 leading-none opacity-80">
-                {lesson.subject}
-              </span>
-            </div>
-          );
-        })}
+              className="absolute -top-1.5 -bottom-1.5 w-[2px] rounded-full bg-red-500 pointer-events-none z-10 shadow-[0_0_8px_rgba(239,68,68,0.6)] transition-[left] duration-700 ease-out"
+              style={{ left: `calc(${arrowPercent}% - 1px)` }}
+            />
+            <div
+              className="absolute -top-[7px] w-2 h-2 rounded-full bg-red-500 pointer-events-none z-10 shadow-[0_0_8px_rgba(239,68,68,0.6)] transition-[left] duration-700 ease-out"
+              style={{ left: `calc(${arrowPercent}% - 4px)` }}
+            />
+          </>
+        )}
       </div>
     </button>
   );
