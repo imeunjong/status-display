@@ -9,7 +9,7 @@ import {
 import { STATUS_ICON, MOOD_ICON } from '@/lib/icons';
 import type { MeResponse, UserRow } from '@/lib/types';
 import { ensurePushSubscription } from '@/lib/subscribe';
-import { Bell, BellOff, CalendarDays } from 'lucide-react';
+import { Bell, BellOff, CalendarDays, type LucideIcon } from 'lucide-react';
 import TimetableSheet from '@/components/TimetableSheet';
 import TodayTimeline from '@/components/TodayTimeline';
 
@@ -185,7 +185,7 @@ function Tile({
   active, Icon, label, onClick,
 }: {
   active: boolean;
-  Icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
+  Icon: LucideIcon;
   label: string;
   onClick: () => void;
 }) {
@@ -287,7 +287,7 @@ function PersonCard({
 function CardIcon({
   Icon, label,
 }: {
-  Icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
+  Icon: LucideIcon;
   label: string;
 }) {
   return (
