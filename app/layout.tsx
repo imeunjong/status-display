@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
   title: '상태표시',
-  description: '커플 상태 공유 프로그램',
+  description: '서로의 지금을 알려주는 곳',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0a0a0a',
+  themeColor: '#000000',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -27,7 +27,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <head>
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
+      </head>
+      <body className="font-sans tracking-ios">{children}</body>
     </html>
   );
 }

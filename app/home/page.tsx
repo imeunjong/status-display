@@ -11,6 +11,7 @@ export default function HomePage() {
   const [me, setMe] = useState<UserRow | null>(null);
   const [partner, setPartner] = useState<UserRow | null>(null);
   const [pushOn, setPushOn] = useState(false);
+  const [tick, setTick] = useState(0);
   const userIdRef = useRef<string | null>(null);
 
   const load = useCallback(async () => {
@@ -31,13 +32,16 @@ export default function HomePage() {
     }
     userIdRef.current = id;
     load().then(() => {
-      // After first load, if paired but no push yet, prompt.
       if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
         setPushOn(true);
       }
     });
     const t = setInterval(load, 5000);
-    return () => clearInterval(t);
+    const t2 = setInterval(() => setTick((n) => n + 1), 30000);
+    return () => {
+      clearInterval(t);
+      clearInterval(t2);
+    };
   }, [router, load]);
 
   useEffect(() => {
@@ -75,83 +79,115 @@ export default function HomePage() {
 
   if (!me) {
     return (
-      <div className="min-h-[100dvh] flex items-center justify-center text-neutral-500">
-        불러오는 중…
+      <div className="min-h-[100dvh] flex items-center justify-center text-ink-3 text-[15px]">
+        불러오는 중
       </div>
     );
   }
 
   return (
-    <main className="min-h-[100dvh] px-4 py-6 max-w-md mx-auto">
-      <PartnerCard partner={partner} />
+    <main className="min-h-[100dvh] bg-glow animate-fade-in">
+      <div className="max-w-md mx-auto px-5 pt-8 pb-12">
+        <PartnerCard partner={partner} tick={tick} />
 
-      {!pushOn && (
-        <button
-          onClick={enablePush}
-          className="w-full mb-4 py-3 rounded-xl bg-card border border-line text-sm text-neutral-300"
-        >
-          🔔 푸시 알림 켜기
-        </button>
-      )}
+        {!pushOn && (
+          <button
+            onClick={enablePush}
+            className="w-full mb-6 h-[44px] glass rounded-2xl text-[14px] text-ink-2 font-medium active:scale-[0.99] transition"
+          >
+            알림 켜기
+          </button>
+        )}
 
-      <section className="mb-6">
-        <h2 className="text-sm text-neutral-400 mb-3 px-1">지금 내 상태</h2>
-        <div className="grid grid-cols-3 gap-3">
-          {STATUSES.map((s) => {
-            const active = me.current_status === s.id;
-            return (
-              <button
+        <Section title="지금 뭐 해">
+          <Grid>
+            {STATUSES.map((s) => (
+              <Tile
                 key={s.id}
+                active={me.current_status === s.id}
+                emoji={s.emoji}
+                label={s.label}
                 onClick={() => pickStatus(s.id)}
-                className={`aspect-square rounded-2xl border flex flex-col items-center justify-center gap-1 transition active:scale-95 ${
-                  active
-                    ? 'bg-accent border-accent text-white'
-                    : 'bg-card border-line text-neutral-100'
-                }`}
-              >
-                <span className="text-3xl">{s.emoji}</span>
-                <span className="text-sm font-medium">{s.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
+              />
+            ))}
+          </Grid>
+        </Section>
 
-      <section>
-        <h2 className="text-sm text-neutral-400 mb-3 px-1">기분</h2>
-        <div className="grid grid-cols-3 gap-3">
-          {MOODS.map((m) => {
-            const active = me.current_mood === m.id;
-            return (
-              <button
+        <Section title="기분은 어때">
+          <Grid>
+            {MOODS.map((m) => (
+              <Tile
                 key={m.id}
+                active={me.current_mood === m.id}
+                emoji={m.emoji}
+                label={m.label}
                 onClick={() => pickMood(m.id)}
-                className={`aspect-square rounded-2xl border flex flex-col items-center justify-center gap-1 transition active:scale-95 ${
-                  active
-                    ? 'bg-accent border-accent text-white'
-                    : 'bg-card border-line text-neutral-100'
-                }`}
-              >
-                <span className="text-3xl">{m.emoji}</span>
-                <span className="text-sm font-medium">{m.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
+              />
+            ))}
+          </Grid>
+        </Section>
 
-      <p className="text-center text-xs text-neutral-600 mt-10">
-        내 코드: <span className="font-mono">{me.invite_code}</span>
-      </p>
+        <p className="text-center text-ink-3 text-[11px] mt-10 tracking-[0.06em]">
+          내 코드 · <span className="font-mono font-semibold">{me.invite_code}</span>
+        </p>
+      </div>
     </main>
   );
 }
 
-function PartnerCard({ partner }: { partner: UserRow | null }) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="mb-7">
+      <h2 className="text-[13px] font-semibold text-ink-2 mb-3 px-1">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function Grid({ children }: { children: React.ReactNode }) {
+  return <div className="grid grid-cols-3 gap-2.5">{children}</div>;
+}
+
+function Tile({
+  active,
+  emoji,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  emoji: string;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={[
+        'aspect-square rounded-[26px] flex flex-col items-center justify-center gap-1.5',
+        'transition-all duration-200 active:scale-[0.94]',
+        active
+          ? 'bg-accent-soft ring-[1.5px] ring-accent shadow-[0_8px_28px_-10px_rgba(255,55,95,0.55)]'
+          : 'glass',
+      ].join(' ')}
+    >
+      <span className="text-[34px] leading-none">{emoji}</span>
+      <span
+        className={[
+          'text-[13px] font-semibold',
+          active ? 'text-white' : 'text-ink-2',
+        ].join(' ')}
+      >
+        {label}
+      </span>
+    </button>
+  );
+}
+
+function PartnerCard({ partner, tick: _ }: { partner: UserRow | null; tick: number }) {
   if (!partner) {
     return (
-      <div className="rounded-2xl bg-card border border-line p-5 mb-6 text-center text-neutral-500">
-        아직 연결된 상대가 없어
+      <div className="glass rounded-4xl px-6 py-8 mb-6 text-center">
+        <p className="text-ink-3 text-[14px]">아직 연결된 상대가 없어</p>
       </div>
     );
   }
@@ -160,21 +196,29 @@ function PartnerCard({ partner }: { partner: UserRow | null }) {
   const updated = partner.updated_at ? new Date(partner.updated_at) : null;
 
   return (
-    <div className="rounded-2xl bg-card border border-line p-5 mb-6">
-      <p className="text-xs text-neutral-500 mb-1">{partner.nickname}</p>
+    <div className="glass-strong rounded-4xl px-6 py-7 mb-6 relative overflow-hidden">
+      <p className="text-ink-3 text-[12px] font-semibold tracking-[0.08em] uppercase mb-3">
+        {partner.nickname}
+      </p>
       {s && m ? (
         <>
-          <p className="text-3xl font-semibold">
-            {s.emoji} {s.label}
-            <span className="text-neutral-500 mx-2">·</span>
-            {m.emoji} {m.label}
-          </p>
+          <div className="flex items-center gap-4 mb-2">
+            <div className="flex flex-col items-center min-w-0">
+              <span className="text-[44px] leading-none">{s.emoji}</span>
+              <span className="text-[13px] font-semibold text-ink-2 mt-2">{s.label}</span>
+            </div>
+            <span className="text-ink-4 text-[22px] font-thin">·</span>
+            <div className="flex flex-col items-center min-w-0">
+              <span className="text-[44px] leading-none">{m.emoji}</span>
+              <span className="text-[13px] font-semibold text-ink-2 mt-2">{m.label}</span>
+            </div>
+          </div>
           {updated && (
-            <p className="text-xs text-neutral-600 mt-2">{timeAgo(updated)}</p>
+            <p className="text-ink-3 text-[11px] mt-3 font-medium">{timeAgo(updated)}</p>
           )}
         </>
       ) : (
-        <p className="text-lg text-neutral-500">아직 상태를 안 정했어</p>
+        <p className="text-[18px] text-ink-2 font-medium">아직 정하지 않았어</p>
       )}
     </div>
   );
@@ -182,7 +226,7 @@ function PartnerCard({ partner }: { partner: UserRow | null }) {
 
 function timeAgo(d: Date): string {
   const sec = Math.floor((Date.now() - d.getTime()) / 1000);
-  if (sec < 60) return '방금 전';
+  if (sec < 60) return '방금';
   if (sec < 3600) return `${Math.floor(sec / 60)}분 전`;
   if (sec < 86400) return `${Math.floor(sec / 3600)}시간 전`;
   return `${Math.floor(sec / 86400)}일 전`;

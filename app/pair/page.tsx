@@ -10,6 +10,7 @@ export default function PairPage() {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const id = localStorage.getItem('user_id');
@@ -29,7 +30,7 @@ export default function PairPage() {
   }, [router]);
 
   async function submit() {
-    if (!code.trim() || loading) return;
+    if (code.length < 6 || loading) return;
     setLoading(true);
     setErr(null);
     try {
@@ -51,43 +52,71 @@ export default function PairPage() {
     }
   }
 
+  async function copyCode() {
+    if (!me) return;
+    try {
+      await navigator.clipboard.writeText(me.invite_code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  }
+
   if (!me) {
     return (
-      <div className="min-h-[100dvh] flex items-center justify-center text-neutral-500">
-        불러오는 중…
+      <div className="min-h-[100dvh] flex items-center justify-center text-ink-3">
+        불러오는 중
       </div>
     );
   }
 
   return (
-    <main className="min-h-[100dvh] flex flex-col items-center justify-center px-6 py-10">
+    <main className="min-h-[100dvh] bg-glow flex flex-col items-center justify-center px-6 py-10 animate-fade-in">
       <div className="w-full max-w-sm">
-        <h1 className="text-xl font-semibold mb-1">상대와 연결하기</h1>
-        <p className="text-neutral-400 mb-8 text-sm">
-          내 코드를 상대에게 알려주거나, 상대 코드를 입력해
+        <h1 className="text-[34px] font-bold tracking-iostight leading-[1.15] mb-2">
+          상대와 연결
+        </h1>
+        <p className="text-ink-2 text-[15px] mb-8">
+          내 코드를 알려주거나, 상대 코드를 입력해
         </p>
 
-        <div className="rounded-2xl bg-card border border-line p-6 mb-6 text-center">
-          <p className="text-neutral-400 text-xs mb-2">내 초대코드</p>
-          <p className="text-4xl font-mono font-bold tracking-[0.3em]">{me.invite_code}</p>
+        <button
+          onClick={copyCode}
+          className="w-full glass-strong rounded-4xl px-6 py-7 mb-6 text-center active:scale-[0.99] transition"
+        >
+          <p className="text-ink-3 text-[11px] uppercase tracking-[0.12em] font-semibold mb-3">
+            내 코드
+          </p>
+          <p className="text-[44px] font-bold tracking-[0.22em] font-mono leading-none">
+            {me.invite_code}
+          </p>
+          <p className="text-ink-3 text-[12px] mt-4">
+            {copied ? '복사됨' : '탭하면 복사'}
+          </p>
+        </button>
+
+        <div className="glass rounded-3xl px-5 py-4 mb-3">
+          <p className="text-ink-3 text-[11px] uppercase tracking-[0.12em] font-semibold mb-1">
+            상대 코드 입력
+          </p>
+          <input
+            type="text"
+            value={code}
+            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            onKeyDown={(e) => e.key === 'Enter' && submit()}
+            placeholder="—————"
+            maxLength={6}
+            className="w-full bg-transparent text-[26px] font-bold font-mono tracking-[0.22em] outline-none text-center placeholder:text-ink-4"
+          />
         </div>
 
-        <input
-          type="text"
-          value={code}
-          onChange={(e) => setCode(e.target.value.toUpperCase())}
-          onKeyDown={(e) => e.key === 'Enter' && submit()}
-          placeholder="상대 초대코드"
-          maxLength={6}
-          className="w-full px-4 py-4 rounded-2xl bg-card border border-line text-center text-2xl font-mono tracking-[0.3em] outline-none focus:border-accent"
-        />
-        {err && <p className="text-red-400 text-sm mt-3">{err}</p>}
+        {err && <p className="text-accent text-[13px] mt-2 px-2">{err}</p>}
+
         <button
           onClick={submit}
           disabled={code.length < 6 || loading}
-          className="w-full mt-4 py-4 rounded-2xl bg-accent text-white font-semibold disabled:opacity-40"
+          className="w-full mt-3 h-[54px] rounded-3xl bg-accent text-white font-semibold text-[17px] disabled:opacity-30 active:scale-[0.98] transition"
         >
-          {loading ? '연결 중…' : '연결하기'}
+          {loading ? '연결 중' : '연결하기'}
         </button>
       </div>
     </main>

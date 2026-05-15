@@ -31,28 +31,45 @@ export default function OnboardingPage() {
   }
 
   return (
-    <main className="min-h-[100dvh] flex items-center justify-center px-6">
+    <main className="min-h-[100dvh] bg-glow flex items-center justify-center px-6 animate-fade-in">
       <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-semibold mb-2">상태표시</h1>
-        <p className="text-neutral-400 mb-8">상대에게 보여줄 닉네임을 정해줘</p>
-        <input
-          type="text"
-          autoFocus
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && submit()}
-          placeholder="닉네임"
-          maxLength={20}
-          className="w-full px-4 py-4 rounded-2xl bg-card border border-line text-lg outline-none focus:border-accent"
-        />
-        {err && <p className="text-red-400 text-sm mt-3">{err}</p>}
+        <div className="mb-12">
+          <h1 className="text-[40px] font-bold tracking-iostight leading-[1.1]">
+            안녕,
+          </h1>
+          <p className="text-[40px] font-bold tracking-iostight leading-[1.1] text-ink-2">
+            이름이 뭐야?
+          </p>
+        </div>
+
+        <div className="glass rounded-3xl px-5 py-4 mb-3">
+          <input
+            type="text"
+            autoFocus
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && submit()}
+            placeholder="닉네임"
+            maxLength={20}
+            className="w-full bg-transparent text-[19px] font-medium outline-none placeholder:text-ink-3"
+          />
+        </div>
+
+        {err && (
+          <p className="text-accent text-[13px] mt-2 px-2">{err}</p>
+        )}
+
         <button
           onClick={submit}
           disabled={!nickname.trim() || loading}
-          className="w-full mt-4 py-4 rounded-2xl bg-accent text-white font-semibold disabled:opacity-40"
+          className="w-full mt-3 h-[54px] rounded-3xl bg-accent text-white font-semibold text-[17px] disabled:opacity-30 active:scale-[0.98] transition"
         >
-          {loading ? '만드는 중…' : '시작하기'}
+          {loading ? '만드는 중' : '계속'}
         </button>
+
+        <p className="text-ink-3 text-[12px] text-center mt-5">
+          이 이름을 상대가 보게 돼
+        </p>
       </div>
     </main>
   );

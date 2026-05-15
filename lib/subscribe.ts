@@ -13,7 +13,7 @@ export async function ensurePushSubscription(userId: string): Promise<boolean> {
 
   const vapidPublic = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   if (!vapidPublic) {
-    console.warn('NEXT_PUBLIC_VAPID_PUBLIC_KEY missing — push disabled');
+    console.warn('NEXT_PUBLIC_VAPID_PUBLIC_KEY missing ??push disabled');
     return false;
   }
 
@@ -30,7 +30,7 @@ export async function ensurePushSubscription(userId: string): Promise<boolean> {
   if (!sub) {
     sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(vapidPublic),
+      applicationServerKey: urlBase64ToUint8Array(vapidPublic) as unknown as BufferSource,
     });
   }
 
