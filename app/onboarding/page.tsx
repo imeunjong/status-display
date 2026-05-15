@@ -1,72 +1,54 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+
+const USERS = [
+  { id: '79a03d6e-6584-49e1-956c-738d39c2c72a', nickname: '황구' },
+  { id: 'd12488aa-8b8a-4ed8-81b7-55d366319fdd', nickname: '젠' },
+];
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [nickname, setNickname] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
 
-  async function submit() {
-    if (!nickname.trim() || loading) return;
-    setLoading(true);
-    setErr(null);
-    try {
-      const res = await fetch('/api/user', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ nickname: nickname.trim() }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || '실패');
-      localStorage.setItem('user_id', json.user.id);
-      router.replace('/pair');
-    } catch (e) {
-      setErr(e instanceof Error ? e.message : '오류');
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    const id = typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
+    if (id && USERS.some((u) => u.id === id)) {
+      router.replace('/home');
     }
+  }, [router]);
+
+  function pick(id: string) {
+    localStorage.setItem('user_id', id);
+    router.replace('/home');
   }
 
   return (
     <main className="min-h-[100dvh] bg-silver flex items-center justify-center px-6 animate-fade-in">
       <div className="w-full max-w-[400px]">
-        <div className="mb-10">
+        <div className="mb-10 text-center">
           <h1 className="text-[44px] font-bold tracking-iostight leading-[1.05] text-ink-1">
-            안녕,
+            너는
           </h1>
           <p className="text-[44px] font-bold tracking-iostight leading-[1.05] text-ink-3">
-            이름이 뭐야?
+            누구야?
           </p>
         </div>
 
-        <div className="card-elev rounded-2xl px-5 py-4 mb-3">
-          <input
-            type="text"
-            autoFocus
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && submit()}
-            placeholder="닉네임"
-            maxLength={20}
-            className="w-full bg-transparent text-[19px] font-medium outline-none text-ink-1 placeholder:text-ink-3"
-          />
+        <div className="grid grid-cols-2 gap-3">
+          {USERS.map((u) => (
+            <button
+              key={u.id}
+              onClick={() => pick(u.id)}
+              className="h-[120px] rounded-3xl card-elev text-ink-1 font-bold text-[32px] tracking-iostight active:scale-[0.97] transition shadow-[0_12px_28px_-14px_rgba(0,0,0,0.25)]"
+            >
+              {u.nickname}
+            </button>
+          ))}
         </div>
 
-        {err && <p className="text-red-500 text-[13px] mt-2 px-2">{err}</p>}
-
-        <button
-          onClick={submit}
-          disabled={!nickname.trim() || loading}
-          className="w-full mt-3 h-[52px] rounded-2xl bg-ink-1 text-white font-semibold text-[16px] disabled:opacity-25 active:scale-[0.98] transition shadow-[0_8px_20px_-8px_rgba(0,0,0,0.35)]"
-        >
-          {loading ? '만드는 중' : '계속'}
-        </button>
-
-        <p className="text-ink-3 text-[12px] text-center mt-5">
-          이 이름을 상대가 보게 돼
+        <p className="text-ink-3 text-[12px] text-center mt-7">
+          탭하면 바로 시작돼
         </p>
       </div>
     </main>

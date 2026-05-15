@@ -25,11 +25,15 @@ export default function HomePage() {
     const id = userIdRef.current;
     if (!id) return;
     const res = await fetch(`/api/me?user_id=${id}`, { cache: 'no-store' });
-    if (!res.ok) return;
+    if (!res.ok) {
+      localStorage.removeItem('user_id');
+      router.replace('/onboarding');
+      return;
+    }
     const json: MeResponse = await res.json();
     setMe(json.me);
     setPartner(json.partner);
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const id = typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
@@ -47,9 +51,6 @@ export default function HomePage() {
     return () => clearInterval(t);
   }, [router, load]);
 
-  useEffect(() => {
-    if (me && !me.partner_id) router.replace('/pair');
-  }, [me, router]);
 
   async function pickStatus(status: StatusId) {
     if (!me) return;
