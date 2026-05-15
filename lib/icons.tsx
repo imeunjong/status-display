@@ -1,5 +1,5 @@
 import {
-  Home, GraduationCap, Dumbbell, Coffee, BookOpen, Moon,
+  Home, Briefcase, Dumbbell, Coffee, BookOpen, Moon,
   Frown, CloudRain, Smile, Flame, Laugh, Ban,
   type LucideIcon,
 } from 'lucide-react';
@@ -7,7 +7,7 @@ import type { StatusId, MoodId } from './constants';
 
 export const STATUS_ICON: Record<StatusId, LucideIcon> = {
   home: Home,
-  school: GraduationCap,
+  school: Briefcase,
   workout: Dumbbell,
   rest: Coffee,
   free_period: BookOpen,

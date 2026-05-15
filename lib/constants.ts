@@ -1,6 +1,6 @@
 export const STATUSES = [
   { id: 'home',        label: '집',     emoji: '🏠' },
-  { id: 'school',      label: '학교',   emoji: '🏫' },
+  { id: 'school',      label: '회사',   emoji: '🏢' },
   { id: 'workout',     label: '운동중', emoji: '🏃' },
   { id: 'rest',        label: '쉬는중', emoji: '☕' },
   { id: 'free_period', label: '공강',   emoji: '📚' },
