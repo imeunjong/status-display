@@ -98,11 +98,7 @@ export default function TodayTimeline({ onOpen }: { onOpen?: () => void }) {
             className="absolute top-0 transition-[left] duration-700 ease-out -translate-x-1/2"
             style={{ left: `${arrowPercent}%` }}
           >
-            <ChevronDown
-              size={14}
-              strokeWidth={2.5}
-              className={loc.state === 'break' ? 'text-ink-3' : 'text-ink-1'}
-            />
+            <ChevronDown size={18} strokeWidth={3} className="arrow-now" />
           </div>
         )}
       </div>
@@ -117,45 +113,31 @@ export default function TodayTimeline({ onOpen }: { onOpen?: () => void }) {
               <div
                 key={p.id}
                 className={[
-                  'h-[42px] rounded-md flex flex-col items-center justify-center border',
-                  active
-                    ? 'border-ink-1 bg-surface-2'
-                    : 'border-dashed border-ink-4 bg-surface-1',
+                  'h-[44px] rounded-md flex flex-col items-center justify-center',
+                  active ? 'cell-free-now' : 'cell-free',
                 ].join(' ')}
               >
-                <span className="text-[9px] font-bold text-ink-3 tabular-nums leading-none">
+                <span className="text-[9px] font-bold tabular-nums leading-none opacity-80">
                   {p.id}
                 </span>
-                <span className="text-[8px] text-ink-3 mt-0.5 leading-none">공강</span>
+                <span className="text-[8px] mt-0.5 leading-none">공강</span>
               </div>
             );
           }
+          const cellClass = lesson.accent
+            ? 'cell-class-mark'
+            : active
+            ? 'cell-class-now'
+            : 'cell-class';
           return (
             <div
               key={p.id}
-              className={[
-                'h-[42px] rounded-md flex flex-col items-center justify-center',
-                lesson.accent
-                  ? 'bg-ink-1 text-white'
-                  : active
-                  ? 'bg-white border-[1.5px] border-ink-1 shadow-[0_4px_10px_-4px_rgba(0,0,0,0.25)]'
-                  : 'card-flat',
-              ].join(' ')}
+              className={['h-[44px] rounded-md flex flex-col items-center justify-center', cellClass].join(' ')}
             >
-              <span
-                className={[
-                  'text-[10px] font-bold tabular-nums leading-none',
-                  lesson.accent ? 'text-white' : 'text-ink-1',
-                ].join(' ')}
-              >
+              <span className="text-[10px] font-bold tabular-nums leading-none">
                 {lesson.room}
               </span>
-              <span
-                className={[
-                  'text-[8px] font-semibold mt-0.5 leading-none',
-                  lesson.accent ? 'text-white/80' : 'text-ink-3',
-                ].join(' ')}
-              >
+              <span className="text-[8px] font-semibold mt-0.5 leading-none opacity-80">
                 {lesson.subject}
               </span>
             </div>

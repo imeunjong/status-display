@@ -114,38 +114,28 @@ function PeriodRow({
               key={d}
               className={[
                 'h-[46px] rounded-md min-w-0',
-                isToday ? 'bg-surface-2' : 'bg-surface-1',
-                'border border-dashed border-ink-4',
+                isToday ? 'cell-free-now' : 'cell-free',
               ].join(' ')}
             />
           );
         }
+        const cellClass = lesson.accent
+          ? 'cell-class-mark'
+          : isToday
+          ? 'cell-class-now'
+          : 'cell-class';
         return (
           <div
             key={d}
             className={[
               'h-[46px] rounded-md flex flex-col items-center justify-center min-w-0 px-0.5',
-              lesson.accent
-                ? 'bg-ink-1 text-white'
-                : isToday
-                ? 'bg-white border-[1.5px] border-ink-1'
-                : 'card-flat',
+              cellClass,
             ].join(' ')}
           >
-            <span
-              className={[
-                'text-[11px] font-bold tabular-nums leading-none',
-                lesson.accent ? 'text-white' : 'text-ink-1',
-              ].join(' ')}
-            >
+            <span className="text-[11px] font-bold tabular-nums leading-none">
               {lesson.room}
             </span>
-            <span
-              className={[
-                'text-[9px] font-semibold mt-0.5 leading-none truncate w-full text-center',
-                lesson.accent ? 'text-white/80' : 'text-ink-2',
-              ].join(' ')}
-            >
+            <span className="text-[9px] font-semibold mt-0.5 leading-none truncate w-full text-center opacity-80">
               {lesson.subject}
             </span>
           </div>
