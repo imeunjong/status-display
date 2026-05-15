@@ -216,6 +216,15 @@ function Tile({
   );
 }
 
+const MOOD_TINT: Record<MoodId, { bg: string; accent: string; ring: string }> = {
+  bad:        { bg: 'linear-gradient(160deg, #f4f4f6 0%, #e3e3e8 100%)', accent: '#6e6e73', ring: 'rgba(110,110,115,0.45)' },
+  sad:        { bg: 'linear-gradient(160deg, #eaf3ff 0%, #c8dcf5 100%)', accent: '#3b6fb8', ring: 'rgba(59,111,184,0.45)' },
+  happy:      { bg: 'linear-gradient(160deg, #fff6dc 0%, #ffe7a3 100%)', accent: '#b07a16', ring: 'rgba(176,122,22,0.45)' },
+  angry:      { bg: 'linear-gradient(160deg, #ffe4e1 0%, #ffb6ad 100%)', accent: '#c33824', ring: 'rgba(195,56,36,0.5)' },
+  fun:        { bg: 'linear-gradient(160deg, #ffe9f1 0%, #ffc4d8 100%)', accent: '#c43d7a', ring: 'rgba(196,61,122,0.45)' },
+  dont_touch: { bg: 'linear-gradient(160deg, #2b2b2e 0%, #0e0e10 100%)', accent: '#ffffff', ring: 'rgba(255,255,255,0.25)' },
+};
+
 function PersonCard({
   label, user, mine,
 }: { label: string; user: UserRow | null; mine?: boolean }) {
@@ -239,6 +248,8 @@ function PersonCard({
     user.current_mood as MoodId | null,
   );
   const updated = user.updated_at ? new Date(user.updated_at) : null;
+  const tint = !mine && user.current_mood ? MOOD_TINT[user.current_mood as MoodId] : null;
+  const isDarkTint = !mine && user.current_mood === 'dont_touch';
 
   return (
     <div
@@ -246,22 +257,56 @@ function PersonCard({
         'rounded-3xl px-4 py-3 h-[112px] flex flex-col relative',
         mine
           ? 'card-flat'
+          : tint
+          ? 'shadow-[0_10px_28px_-12px_rgba(0,0,0,0.18)]'
           : 'card-elev ring-[1.5px] ring-ink-1 shadow-[0_10px_28px_-12px_rgba(0,0,0,0.25)]',
       ].join(' ')}
+      style={
+        tint
+          ? {
+              background: tint.bg,
+              boxShadow: `0 10px 28px -12px ${tint.ring}, inset 0 0 0 1.5px ${tint.ring}`,
+            }
+          : undefined
+      }
     >
       {!mine && (
-        <span className="absolute -top-1.5 left-3 text-[9px] font-bold tracking-[0.14em] uppercase bg-ink-1 text-white px-1.5 py-[3px] rounded-full leading-none">
+        <span
+          className="absolute -top-1.5 left-3 text-[9px] font-bold tracking-[0.14em] uppercase px-1.5 py-[3px] rounded-full leading-none"
+          style={
+            tint
+              ? { background: tint.accent, color: isDarkTint ? '#0e0e10' : '#ffffff' }
+              : { background: '#1d1d1f', color: '#ffffff' }
+          }
+        >
           NOW
         </span>
       )}
       <div className="flex items-center justify-between mb-1">
-        <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-ink-3 truncate">
+        <p
+          className={[
+            'text-[10px] uppercase tracking-[0.14em] font-semibold truncate',
+            isDarkTint ? 'text-white/70' : 'text-ink-3',
+          ].join(' ')}
+        >
           {label} · {user.nickname}
         </p>
         {score !== null && (
-          <span className="text-[13px] font-bold tabular-nums text-ink-1 leading-none">
+          <span
+            className={[
+              'text-[13px] font-bold tabular-nums leading-none',
+              isDarkTint ? 'text-white' : 'text-ink-1',
+            ].join(' ')}
+          >
             {score}
-            <span className="text-ink-3 text-[9px] font-medium ml-0.5">/100</span>
+            <span
+              className={[
+                'text-[9px] font-medium ml-0.5',
+                isDarkTint ? 'text-white/50' : 'text-ink-3',
+              ].join(' ')}
+            >
+              /100
+            </span>
           </span>
         )}
       </div>
@@ -269,11 +314,26 @@ function PersonCard({
       {s && m ? (
         <>
           <div className="flex-1 flex items-center gap-2 mt-1">
-            <CardIcon Icon={STATUS_ICON[user.current_status as StatusId]} label={s.label} />
-            <CardIcon Icon={MOOD_ICON[user.current_mood as MoodId]} label={m.label} />
+            <CardIcon
+              Icon={STATUS_ICON[user.current_status as StatusId]}
+              label={s.label}
+              dark={isDarkTint}
+            />
+            <CardIcon
+              Icon={MOOD_ICON[user.current_mood as MoodId]}
+              label={m.label}
+              dark={isDarkTint}
+            />
           </div>
           {updated && !mine && (
-            <p className="text-ink-3 text-[10px] mt-1 font-medium">{timeAgo(updated)}</p>
+            <p
+              className={[
+                'text-[10px] mt-1 font-medium',
+                isDarkTint ? 'text-white/55' : 'text-ink-3',
+              ].join(' ')}
+            >
+              {timeAgo(updated)}
+            </p>
           )}
         </>
       ) : (
@@ -286,15 +346,23 @@ function PersonCard({
 }
 
 function CardIcon({
-  Icon, label,
+  Icon, label, dark,
 }: {
   Icon: LucideIcon;
   label: string;
+  dark?: boolean;
 }) {
   return (
     <div className="flex flex-col items-center min-w-0 flex-1">
-      <Icon size={24} strokeWidth={1.8} className="text-ink-1" />
-      <span className="text-[11px] font-semibold text-ink-2 mt-1 truncate">{label}</span>
+      <Icon size={24} strokeWidth={1.8} className={dark ? 'text-white' : 'text-ink-1'} />
+      <span
+        className={[
+          'text-[11px] font-semibold mt-1 truncate',
+          dark ? 'text-white/85' : 'text-ink-2',
+        ].join(' ')}
+      >
+        {label}
+      </span>
     </div>
   );
 }
