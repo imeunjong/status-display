@@ -44,11 +44,18 @@ function locate(now: Date): Loc {
 }
 
 export default function TodayTimeline({ onOpen }: { onOpen?: () => void }) {
+  const [now, setNow] = useState<Date>(() => new Date());
   const [loc, setLoc] = useState<Loc>(() => locate(new Date()));
   useEffect(() => {
-    const t = setInterval(() => setLoc(locate(new Date())), 30000);
+    const tick = () => {
+      const d = new Date();
+      setNow(d);
+      setLoc(locate(d));
+    };
+    const t = setInterval(tick, 30000);
     return () => clearInterval(t);
   }, []);
+  const timeLabel = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
   const today = (DAYS as readonly string[]).includes(loc.day) ? (loc.day as Day) : null;
   const todaySchedule = today ? SCHEDULE[today] : {};
@@ -81,7 +88,7 @@ export default function TodayTimeline({ onOpen }: { onOpen?: () => void }) {
   return (
     <button
       onClick={onOpen}
-      className="w-full card-flat rounded-3xl px-3.5 pt-3 pb-3 mb-4 text-left active:scale-[0.995] transition"
+      className="w-full card-flat rounded-3xl px-3.5 pt-3 pb-7 mb-4 text-left active:scale-[0.995] transition"
     >
       <div className="flex items-center justify-between mb-3 px-0.5">
         <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-ink-3">
@@ -142,6 +149,14 @@ export default function TodayTimeline({ onOpen }: { onOpen?: () => void }) {
               className="absolute -top-[7px] w-2 h-2 rounded-full bg-red-500 pointer-events-none z-10 shadow-[0_0_8px_rgba(239,68,68,0.6)] transition-[left] duration-700 ease-out"
               style={{ left: `calc(${arrowPercent}% - 4px)` }}
             />
+            <div
+              className="absolute -bottom-[22px] pointer-events-none z-10 transition-[left] duration-700 ease-out"
+              style={{ left: `calc(${arrowPercent}% - 18px)` }}
+            >
+              <span className="text-[10px] font-bold text-red-500 bg-white px-1.5 py-0.5 rounded-md shadow-sm tabular-nums">
+                {timeLabel}
+              </span>
+            </div>
           </>
         )}
       </div>

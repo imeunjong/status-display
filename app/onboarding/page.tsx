@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const USERS = [
@@ -10,13 +9,6 @@ const USERS = [
 
 export default function OnboardingPage() {
   const router = useRouter();
-
-  useEffect(() => {
-    const id = typeof window !== 'undefined' ? localStorage.getItem('user_id') : null;
-    if (id && USERS.some((u) => u.id === id)) {
-      router.replace('/home');
-    }
-  }, [router]);
 
   function pick(id: string) {
     localStorage.setItem('user_id', id);
