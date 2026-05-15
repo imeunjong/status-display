@@ -88,9 +88,9 @@ export default function TodayTimeline({ onOpen }: { onOpen?: () => void }) {
   return (
     <button
       onClick={onOpen}
-      className="w-full card-flat rounded-3xl px-3.5 pt-3 pb-7 mb-4 text-left active:scale-[0.995] transition"
+      className="w-full card-flat rounded-3xl px-3.5 pt-2.5 pb-6 mb-3 text-left active:scale-[0.995] transition"
     >
-      <div className="flex items-center justify-between mb-3 px-0.5">
+      <div className="flex items-center justify-between mb-2 px-0.5">
         <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-ink-3">
           오늘
         </p>
@@ -108,7 +108,7 @@ export default function TodayTimeline({ onOpen }: { onOpen?: () => void }) {
                 <div
                   key={p.id}
                   className={[
-                    'h-[44px] rounded-md flex flex-col items-center justify-center',
+                    'h-[40px] rounded-md flex flex-col items-center justify-center',
                     active ? 'cell-free-now' : 'cell-free',
                   ].join(' ')}
                 >
@@ -124,7 +124,7 @@ export default function TodayTimeline({ onOpen }: { onOpen?: () => void }) {
               <div
                 key={p.id}
                 className={[
-                  'h-[44px] rounded-md flex flex-col items-center justify-center',
+                  'h-[40px] rounded-md flex flex-col items-center justify-center',
                   cellClass,
                 ].join(' ')}
               >

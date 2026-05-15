@@ -91,9 +91,9 @@ export default function HomePage() {
 
   return (
     <main className="min-h-[100dvh] bg-silver animate-fade-in">
-      <div className="max-w-[440px] mx-auto px-4 pt-4 pb-5 flex flex-col min-h-[100dvh]">
+      <div className="max-w-[440px] mx-auto px-4 pt-3 pb-3 flex flex-col min-h-[100dvh]">
         {/* Header bar */}
-        <div className="flex items-center justify-between mb-3 px-1">
+        <div className="flex items-center justify-between mb-2 px-1">
           <h1 className="text-[15px] font-bold tracking-iostight text-ink-1">상태표시</h1>
           <div className="flex items-center gap-1.5">
             <button
@@ -117,7 +117,7 @@ export default function HomePage() {
         </div>
 
         {/* Two cards side by side — partner is emphasized */}
-        <div className="grid grid-cols-[1fr_1.15fr] gap-2.5 mb-3 items-stretch">
+        <div className="grid grid-cols-[1fr_1.15fr] gap-2.5 mb-2 items-stretch">
           <PersonCard label="나" user={me} mine />
           <PersonCard label="상대" user={partner} />
         </div>
@@ -169,8 +169,8 @@ export default function HomePage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="mb-3">
-      <h2 className="text-[11px] font-semibold text-ink-3 mb-2 px-1 uppercase tracking-[0.12em]">
+    <section className="mb-2">
+      <h2 className="text-[11px] font-semibold text-ink-3 mb-1.5 px-1 uppercase tracking-[0.12em]">
         {title}
       </h2>
       {children}
@@ -179,7 +179,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-3 gap-2">{children}</div>;
+  return <div className="grid grid-cols-3 gap-1.5">{children}</div>;
 }
 
 function Tile({
@@ -194,7 +194,7 @@ function Tile({
     <button
       onClick={onClick}
       className={[
-        'h-[80px] rounded-2xl flex flex-col items-center justify-center gap-1.5',
+        'h-[72px] rounded-2xl flex flex-col items-center justify-center gap-1',
         'transition-all duration-200 active:scale-[0.94]',
         active ? 'tile-silver-active' : 'tile-silver',
       ].join(' ')}
@@ -221,7 +221,7 @@ function PersonCard({
 }: { label: string; user: UserRow | null; mine?: boolean }) {
   if (!user) {
     return (
-      <div className="card-elev rounded-3xl px-4 py-4 h-[120px] flex flex-col">
+      <div className="card-elev rounded-3xl px-4 py-3 h-[108px] flex flex-col">
         <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-ink-3 mb-1">
           {label}
         </p>
@@ -243,7 +243,7 @@ function PersonCard({
   return (
     <div
       className={[
-        'rounded-3xl px-4 py-3.5 h-[124px] flex flex-col relative',
+        'rounded-3xl px-4 py-3 h-[112px] flex flex-col relative',
         mine
           ? 'card-flat'
           : 'card-elev ring-[1.5px] ring-ink-1 shadow-[0_10px_28px_-12px_rgba(0,0,0,0.25)]',
