@@ -17,26 +17,29 @@ const config: Config = {
       },
       colors: {
         ink: {
-          1: '#ffffff',
-          2: 'rgba(235,235,245,0.6)',
-          3: 'rgba(235,235,245,0.3)',
-          4: 'rgba(235,235,245,0.18)',
+          1: '#1d1d1f',
+          2: '#6e6e73',
+          3: '#a1a1a6',
+          4: '#d2d2d7',
         },
-        accent: {
-          DEFAULT: '#ff375f',
-          soft: 'rgba(255,55,95,0.16)',
+        surface: {
+          DEFAULT: '#ffffff',
+          1: '#fbfbfd',
+          2: '#f5f5f7',
+          3: '#ececef',
         },
+        line: 'rgba(0,0,0,0.08)',
       },
       letterSpacing: {
-        ios: '-0.012em',
-        iostight: '-0.022em',
+        ios: '-0.018em',
+        iostight: '-0.026em',
       },
       borderRadius: {
         '4xl': '28px',
         '5xl': '36px',
       },
       animation: {
-        'fade-in': 'fadeIn 240ms ease-out',
+        'fade-in': 'fadeIn 280ms cubic-bezier(0.22, 1, 0.36, 1)',
       },
       keyframes: {
         fadeIn: {

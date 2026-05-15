@@ -31,18 +31,18 @@ export default function OnboardingPage() {
   }
 
   return (
-    <main className="min-h-[100dvh] bg-glow flex items-center justify-center px-6 animate-fade-in">
-      <div className="w-full max-w-sm">
-        <div className="mb-12">
-          <h1 className="text-[40px] font-bold tracking-iostight leading-[1.1]">
+    <main className="min-h-[100dvh] bg-silver flex items-center justify-center px-6 animate-fade-in">
+      <div className="w-full max-w-[400px]">
+        <div className="mb-10">
+          <h1 className="text-[44px] font-bold tracking-iostight leading-[1.05] text-ink-1">
             안녕,
           </h1>
-          <p className="text-[40px] font-bold tracking-iostight leading-[1.1] text-ink-2">
+          <p className="text-[44px] font-bold tracking-iostight leading-[1.05] text-ink-3">
             이름이 뭐야?
           </p>
         </div>
 
-        <div className="glass rounded-3xl px-5 py-4 mb-3">
+        <div className="card-elev rounded-2xl px-5 py-4 mb-3">
           <input
             type="text"
             autoFocus
@@ -51,18 +51,16 @@ export default function OnboardingPage() {
             onKeyDown={(e) => e.key === 'Enter' && submit()}
             placeholder="닉네임"
             maxLength={20}
-            className="w-full bg-transparent text-[19px] font-medium outline-none placeholder:text-ink-3"
+            className="w-full bg-transparent text-[19px] font-medium outline-none text-ink-1 placeholder:text-ink-3"
           />
         </div>
 
-        {err && (
-          <p className="text-accent text-[13px] mt-2 px-2">{err}</p>
-        )}
+        {err && <p className="text-red-500 text-[13px] mt-2 px-2">{err}</p>}
 
         <button
           onClick={submit}
           disabled={!nickname.trim() || loading}
-          className="w-full mt-3 h-[54px] rounded-3xl bg-accent text-white font-semibold text-[17px] disabled:opacity-30 active:scale-[0.98] transition"
+          className="w-full mt-3 h-[52px] rounded-2xl bg-ink-1 text-white font-semibold text-[16px] disabled:opacity-25 active:scale-[0.98] transition shadow-[0_8px_20px_-8px_rgba(0,0,0,0.35)]"
         >
           {loading ? '만드는 중' : '계속'}
         </button>

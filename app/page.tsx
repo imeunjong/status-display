@@ -10,7 +10,7 @@ export default function RootPage() {
     router.replace(id ? '/home' : '/onboarding');
   }, [router]);
   return (
-    <div className="min-h-[100dvh] flex items-center justify-center text-ink-3 text-[15px]">
+    <div className="min-h-[100dvh] bg-silver flex items-center justify-center text-ink-3 text-[14px]">
       불러오는 중
     </div>
   );
