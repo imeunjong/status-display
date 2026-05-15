@@ -9,7 +9,7 @@ import {
 import { STATUS_ICON, MOOD_ICON } from '@/lib/icons';
 import type { MeResponse, UserRow } from '@/lib/types';
 import { ensurePushSubscription } from '@/lib/subscribe';
-import { Bell, BellOff, CalendarDays, type LucideIcon } from 'lucide-react';
+import { Bell, BellOff, CalendarDays, LogOut, type LucideIcon } from 'lucide-react';
 import TimetableSheet from '@/components/TimetableSheet';
 import TodayTimeline from '@/components/TodayTimeline';
 
@@ -112,6 +112,16 @@ export default function HomePage() {
             >
               {pushOn ? <Bell size={12} strokeWidth={2.2} /> : <BellOff size={12} strokeWidth={2.2} />}
               {pushOn ? '켜짐' : '알림 켜기'}
+            </button>
+            <button
+              onClick={() => {
+                localStorage.removeItem('user_id');
+                router.replace('/onboarding');
+              }}
+              aria-label="로그아웃"
+              className="flex items-center justify-center w-7 h-7 rounded-full card-flat text-ink-2 active:scale-95 transition"
+            >
+              <LogOut size={12} strokeWidth={2.2} />
             </button>
           </div>
         </div>
