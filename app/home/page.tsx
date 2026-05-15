@@ -205,7 +205,7 @@ function Tile({
       onClick={onClick}
       className={[
         'h-[72px] rounded-2xl flex flex-col items-center justify-center gap-1',
-        'transition-all duration-200 active:scale-[0.94]',
+        'transition-transform duration-100 active:scale-[0.94]',
         active ? 'tile-silver-active' : 'tile-silver',
       ].join(' ')}
     >
