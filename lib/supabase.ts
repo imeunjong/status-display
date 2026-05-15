@@ -12,6 +12,10 @@ export function admin(): SupabaseClient {
   }
   cached = createClient(url, service, {
     auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      fetch: (input, init) =>
+        fetch(input as RequestInfo, { ...init, cache: 'no-store' }),
+    },
   });
   return cached;
 }
