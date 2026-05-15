@@ -3,7 +3,7 @@ import type { StatusId, MoodId } from './constants';
 export interface UserRow {
   id: string;
   nickname: string;
-  invite_code: string;
+  partner_nickname: string | null;
   partner_id: string | null;
   current_status: StatusId | null;
   current_mood: MoodId | null;

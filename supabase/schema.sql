@@ -5,7 +5,7 @@ create extension if not exists "pgcrypto";
 create table if not exists public.users (
   id uuid primary key default gen_random_uuid(),
   nickname text not null,
-  invite_code text,
+  partner_nickname text,
   partner_id uuid references public.users(id) on delete set null,
   current_status text,
   current_mood text,
@@ -14,13 +14,28 @@ create table if not exists public.users (
   updated_at timestamptz not null default now()
 );
 
--- v1 → v2 migration: drop unique constraint (both partners share the same code)
+-- v2 → v3 migration
 alter table public.users drop constraint if exists users_invite_code_key;
-alter table public.users alter column invite_code drop not null;
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='users' and column_name='invite_code'
+  ) and not exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='users' and column_name='partner_nickname'
+  ) then
+    alter table public.users rename column invite_code to partner_nickname;
+  end if;
+end $$;
 
+alter table public.users alter column partner_nickname drop not null;
+
+drop index if exists users_pending_pair_idx;
 create index if not exists users_partner_id_idx on public.users(partner_id);
-create index if not exists users_pending_pair_idx
-  on public.users(invite_code) where partner_id is null;
+create index if not exists users_nickname_lookup_idx on public.users(nickname);
+create index if not exists users_pending_partner_idx
+  on public.users(partner_nickname) where partner_id is null;
 
 create table if not exists public.status_logs (
   id bigserial primary key,

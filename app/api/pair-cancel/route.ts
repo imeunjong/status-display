@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   const sb = admin();
   await sb
     .from('users')
-    .update({ invite_code: null, updated_at: new Date().toISOString() })
+    .update({ partner_nickname: null, updated_at: new Date().toISOString() })
     .eq('id', userId)
     .is('partner_id', null);
   return NextResponse.json({ ok: true });

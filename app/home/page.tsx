@@ -11,6 +11,7 @@ import type { MeResponse, UserRow } from '@/lib/types';
 import { ensurePushSubscription } from '@/lib/subscribe';
 import { Bell, BellOff, CalendarDays } from 'lucide-react';
 import TimetableSheet from '@/components/TimetableSheet';
+import TodayTimeline from '@/components/TodayTimeline';
 
 export default function HomePage() {
   const router = useRouter();
@@ -115,10 +116,13 @@ export default function HomePage() {
         </div>
 
         {/* Two cards side by side — partner is emphasized */}
-        <div className="grid grid-cols-[1fr_1.15fr] gap-2.5 mb-4 items-stretch">
+        <div className="grid grid-cols-[1fr_1.15fr] gap-2.5 mb-3 items-stretch">
           <PersonCard label="나" user={me} mine />
           <PersonCard label="상대" user={partner} />
         </div>
+
+        {/* Today's timeline */}
+        <TodayTimeline onOpen={() => setTimetableOpen(true)} />
 
         {/* Status section */}
         <Section title="지금 뭐 해">

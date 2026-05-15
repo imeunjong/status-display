@@ -43,33 +43,33 @@ export default function TimetableSheet({
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 pt-3 pb-4">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.14em] font-semibold text-ink-3">
+        <div className="flex items-center justify-between px-4 pt-3 pb-3">
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-ink-3">
               시간표
             </p>
-            <h2 className="text-[22px] font-bold tracking-iostight text-ink-1 mt-0.5">
+            <h2 className="text-[18px] font-bold tracking-iostight text-ink-1 mt-0.5 truncate">
               {TIMETABLE_OWNER}의 한 주
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-surface-2 flex items-center justify-center active:scale-95 transition"
+            className="w-8 h-8 rounded-full bg-surface-2 flex items-center justify-center active:scale-95 transition shrink-0"
           >
-            <X size={18} strokeWidth={2} className="text-ink-1" />
+            <X size={16} strokeWidth={2} className="text-ink-1" />
           </button>
         </div>
 
         {/* Grid */}
-        <div className="px-3 pb-3 overflow-y-auto" style={{ maxHeight: 'calc(92dvh - 130px)' }}>
-          <div className="grid grid-cols-[44px_repeat(5,1fr)] gap-1">
+        <div className="px-2.5 pb-3 overflow-y-auto" style={{ maxHeight: 'calc(92dvh - 110px)' }}>
+          <div className="grid grid-cols-[28px_repeat(5,minmax(0,1fr))] gap-1">
             {/* Header row */}
             <div />
             {DAYS.map((d, i) => (
               <div
                 key={d}
                 className={[
-                  'text-center text-[12px] font-bold py-2 rounded-lg',
+                  'text-center text-[11px] font-bold py-1.5 rounded-md min-w-0',
                   todayIdx === i ? 'bg-ink-1 text-white' : 'text-ink-2',
                 ].join(' ')}
               >
@@ -83,7 +83,7 @@ export default function TimetableSheet({
             ))}
           </div>
 
-          <p className="text-[11px] text-ink-3 text-center mt-4 font-medium">
+          <p className="text-[10px] text-ink-3 text-center mt-3 font-medium">
             업데이트 {TIMETABLE_UPDATED}
           </p>
         </div>
@@ -97,9 +97,13 @@ function PeriodRow({
 }: { period: { id: number; start: string }; todayIdx: number }) {
   return (
     <>
-      <div className="flex flex-col items-center justify-center py-2">
-        <span className="text-[13px] font-bold text-ink-1 tabular-nums">{period.id}</span>
-        <span className="text-[9px] text-ink-3 tabular-nums mt-0.5">{period.start}</span>
+      <div className="flex flex-col items-center justify-center py-1 min-w-0">
+        <span className="text-[11px] font-bold text-ink-1 tabular-nums leading-none">
+          {period.id}
+        </span>
+        <span className="text-[8px] text-ink-3 tabular-nums mt-0.5 leading-none">
+          {period.start}
+        </span>
       </div>
       {DAYS.map((d, i) => {
         const lesson = SCHEDULE[d][period.id];
@@ -109,9 +113,9 @@ function PeriodRow({
             <div
               key={d}
               className={[
-                'h-[50px] rounded-lg',
+                'h-[46px] rounded-md min-w-0',
                 isToday ? 'bg-surface-2' : 'bg-surface-1',
-                'border border-line',
+                'border border-dashed border-ink-4',
               ].join(' ')}
             />
           );
@@ -120,17 +124,17 @@ function PeriodRow({
           <div
             key={d}
             className={[
-              'h-[50px] rounded-lg flex flex-col items-center justify-center',
+              'h-[46px] rounded-md flex flex-col items-center justify-center min-w-0 px-0.5',
               lesson.accent
                 ? 'bg-ink-1 text-white'
                 : isToday
-                ? 'bg-white border border-ink-1/30'
+                ? 'bg-white border-[1.5px] border-ink-1'
                 : 'card-flat',
             ].join(' ')}
           >
             <span
               className={[
-                'text-[12px] font-bold tabular-nums leading-none',
+                'text-[11px] font-bold tabular-nums leading-none',
                 lesson.accent ? 'text-white' : 'text-ink-1',
               ].join(' ')}
             >
@@ -138,7 +142,7 @@ function PeriodRow({
             </span>
             <span
               className={[
-                'text-[10px] font-semibold mt-1 leading-none',
+                'text-[9px] font-semibold mt-0.5 leading-none truncate w-full text-center',
                 lesson.accent ? 'text-white/80' : 'text-ink-2',
               ].join(' ')}
             >

@@ -56,5 +56,5 @@ export const SCHEDULE: Record<Day, Record<number, Lesson>> = {
   },
 };
 
-export const TIMETABLE_OWNER = '유선';
+export const TIMETABLE_OWNER = '젠';
 export const TIMETABLE_UPDATED = '2026-05-11';
