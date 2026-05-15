@@ -1,66 +1,70 @@
 import { NextResponse } from 'next/server';
-import { admin } from '@/lib/supabase';
+import { admin, makeInviteCode } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// 양쪽이 서로의 닉네임을 입력하면 매칭된다.
-// - A 가 "황구" 입력하면, nickname='황구' 인 사용자 B 를 찾는다.
-// - B 가 partner_nickname='젠' (= A 의 nickname) 이면 양쪽 매칭.
-// - 그렇지 않으면 A.partner_nickname='황구' 저장하고 대기.
+// 초대 링크/코드 기반 페어링.
+// 흐름:
+//   1) A 가 가입하면 자동으로 pair_code 발급되어 본인 화면에 표시됨.
+//   2) A 가 코드/링크를 B 에게 공유.
+//   3) B 가 /join/[code] 진입 → 닉네임 입력 → 이 API 호출.
+//   4) B 사용자 신규 생성 + 양쪽 partner_id 세팅.
+//
+// Body: { code: string, nickname: string }
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
-  const userId = String(body.user_id || '');
-  const target = String(body.partner_nickname || '').trim();
-  if (!userId || !target) {
-    return NextResponse.json({ error: '상대 이름을 입력해' }, { status: 400 });
-  }
+  const code = String(body.code || '').trim().toUpperCase();
+  const nickname = String(body.nickname || '').trim().slice(0, 20);
+
+  if (!code) return NextResponse.json({ error: '코드가 없어' }, { status: 400 });
+  if (!nickname) return NextResponse.json({ error: '닉네임을 입력해' }, { status: 400 });
 
   const sb = admin();
 
-  const { data: me, error: meErr } = await sb
+  // 1) 초대자 조회
+  const { data: inviter, error: invErr } = await sb
     .from('users')
     .select('*')
-    .eq('id', userId)
+    .eq('pair_code', code)
     .maybeSingle();
-  if (meErr || !me) return NextResponse.json({ error: '내 정보 없음' }, { status: 404 });
+  if (invErr) return NextResponse.json({ error: invErr.message }, { status: 500 });
+  if (!inviter) return NextResponse.json({ error: '잘못된 코드' }, { status: 404 });
 
-  if (me.partner_id) {
-    return NextResponse.json({ ok: true, matched: true });
+  // 2) 이미 페어 된 코드면 거절
+  if (inviter.partner_id) {
+    return NextResponse.json({ error: '이미 연결된 코드' }, { status: 409 });
   }
 
-  if (target === me.nickname) {
-    return NextResponse.json({ error: '본인 이름은 안 돼' }, { status: 400 });
+  // 3) 합류자(B) 신규 생성. pair_code 충돌 회피 위해 재시도.
+  let joiner: any = null;
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const newCode = makeInviteCode();
+    const { data, error } = await sb
+      .from('users')
+      .insert({ nickname, pair_code: newCode })
+      .select('*')
+      .single();
+    if (!error) {
+      joiner = data;
+      break;
+    }
+    if (!String(error.message).toLowerCase().includes('pair_code')) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
   }
+  if (!joiner) return NextResponse.json({ error: '가입 실패' }, { status: 500 });
 
-  // 상대 닉네임을 가진 사용자 후보 — 본인을 상대로 지정해 둔(=서로 부른) 사람 우선
-  const { data: candidates } = await sb
-    .from('users')
-    .select('*')
-    .eq('nickname', target)
-    .is('partner_id', null);
-
-  const mutual = (candidates || []).find((c) => c.partner_nickname === me.nickname);
-
-  if (mutual) {
-    const now = new Date().toISOString();
-    await sb.from('users').update({
-      partner_id: mutual.id,
-      partner_nickname: null,
-      updated_at: now,
-    }).eq('id', me.id);
-    await sb.from('users').update({
-      partner_id: me.id,
-      partner_nickname: null,
-      updated_at: now,
-    }).eq('id', mutual.id);
-    return NextResponse.json({ ok: true, matched: true, partner: mutual });
-  }
-
-  // 대기 등록
+  // 4) 양쪽 partner_id 세팅
+  const now = new Date().toISOString();
   await sb
     .from('users')
-    .update({ partner_nickname: target, updated_at: new Date().toISOString() })
-    .eq('id', me.id);
-  return NextResponse.json({ ok: true, matched: false, waiting: true });
+    .update({ partner_id: inviter.id, updated_at: now })
+    .eq('id', joiner.id);
+  await sb
+    .from('users')
+    .update({ partner_id: joiner.id, updated_at: now })
+    .eq('id', inviter.id);
+
+  return NextResponse.json({ ok: true, user: { ...joiner, partner_id: inviter.id } });
 }
