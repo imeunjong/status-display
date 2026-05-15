@@ -21,8 +21,35 @@ export default function TimetableSheet({
 
   if (!open) return null;
 
-  const today = new Date().getDay(); // 0=Sun..6=Sat
+  const now = new Date();
+  const today = now.getDay(); // 0=Sun..6=Sat
   const todayIdx = today >= 1 && today <= 5 ? today - 1 : -1;
+
+  // 빨간 가로선: 현재 시각이 어느 위치인지
+  const ROW_H = 46;
+  const ROW_GAP = 4;
+  const ROW_PITCH = ROW_H + ROW_GAP;
+  const toMin = (s: string) => {
+    const [h, m] = s.split(':').map(Number);
+    return h * 60 + m;
+  };
+  const minutes = now.getHours() * 60 + now.getMinutes();
+  const starts = PERIODS.map((p) => toMin(p.start));
+  let nowY: number | null = null;
+  if (todayIdx !== -1 && minutes >= starts[0]) {
+    const lastEnd = starts[starts.length - 1] + 55;
+    if (minutes < lastEnd) {
+      for (let i = 0; i < PERIODS.length; i++) {
+        const start = starts[i];
+        const next = i < starts.length - 1 ? starts[i + 1] : start + 55;
+        if (minutes >= start && minutes < next) {
+          const progress = Math.min(1, (minutes - start) / 55);
+          nowY = i * ROW_PITCH + progress * ROW_H;
+          break;
+        }
+      }
+    }
+  }
 
   return (
     <div
@@ -62,25 +89,52 @@ export default function TimetableSheet({
 
         {/* Grid */}
         <div className="px-2.5 pb-3 overflow-y-auto" style={{ maxHeight: 'calc(92dvh - 110px)' }}>
-          <div className="grid grid-cols-[28px_repeat(5,minmax(0,1fr))] gap-1">
-            {/* Header row */}
+          {/* Header row — separate grid for clean alignment */}
+          <div
+            className="grid gap-1 mb-1"
+            style={{ gridTemplateColumns: '32px repeat(5, minmax(0, 1fr))' }}
+          >
             <div />
             {DAYS.map((d, i) => (
-              <div
-                key={d}
-                className={[
-                  'text-center text-[11px] font-bold py-1.5 rounded-md min-w-0',
-                  todayIdx === i ? 'bg-ink-1 text-white' : 'text-ink-2',
-                ].join(' ')}
-              >
-                {d}
+              <div key={d} className="text-center min-w-0">
+                <span
+                  className={[
+                    'inline-flex items-center justify-center text-[11px] font-bold rounded-md px-2 py-1.5 min-w-[24px]',
+                    todayIdx === i
+                      ? 'bg-ink-1 text-white'
+                      : 'text-ink-2',
+                  ].join(' ')}
+                >
+                  {d}
+                </span>
               </div>
             ))}
+          </div>
 
-            {/* Period rows */}
-            {PERIODS.map((p) => (
-              <PeriodRow key={p.id} period={p} todayIdx={todayIdx} />
-            ))}
+          {/* Period rows with horizontal red current-time line */}
+          <div className="relative">
+            <div
+              className="grid gap-1"
+              style={{ gridTemplateColumns: '32px repeat(5, minmax(0, 1fr))' }}
+            >
+              {PERIODS.map((p) => (
+                <PeriodRow key={p.id} period={p} todayIdx={todayIdx} />
+              ))}
+            </div>
+            {nowY !== null && (
+              <div
+                className="absolute pointer-events-none z-10 transition-[top] duration-700 ease-out"
+                style={{ top: `${nowY}px`, left: '32px', right: 0 }}
+              >
+                <div className="relative h-[2px] bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.55)]">
+                  <span className="absolute -left-2 -top-[5px] w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.7)]" />
+                  <span className="absolute -top-[18px] right-1 text-[10px] font-bold text-red-500 bg-white px-1.5 py-0.5 rounded-md shadow-sm tabular-nums">
+                    {now.getHours().toString().padStart(2, '0')}:
+                    {now.getMinutes().toString().padStart(2, '0')}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           <p className="text-[10px] text-ink-3 text-center mt-3 font-medium">
@@ -119,11 +173,8 @@ function PeriodRow({
             />
           );
         }
-        const cellClass = lesson.accent
-          ? 'cell-class-mark'
-          : isToday
-          ? 'cell-class-now'
-          : 'cell-class';
+        // 정보 셀도 일반 수업과 같은 색
+        const cellClass = isToday ? 'cell-class-now' : 'cell-class';
         return (
           <div
             key={d}
