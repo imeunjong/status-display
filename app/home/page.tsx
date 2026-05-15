@@ -117,9 +117,9 @@ export default function HomePage() {
         </div>
 
         {/* Two cards side by side — partner is emphasized */}
-        <div className="grid grid-cols-[1fr_1.15fr] gap-2.5 mb-2 items-stretch">
-          <PersonCard label="나" user={me} mine />
+        <div className="grid grid-cols-[1.15fr_1fr] gap-2.5 mb-2 items-stretch">
           <PersonCard label="상대" user={partner} />
+          <PersonCard label="나" user={me} mine />
         </div>
 
         {/* Today's timeline */}
